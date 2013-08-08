@@ -29,22 +29,34 @@ class Chef::ResourceDefinitionList::MongoDB
     require 'mongo'
     
     if members.length == 0
-      abort("cannot configure replicaset '#{name}', no member nodes found")
+      if Chef::Config[:solo]
+        abort("Cannot configure replicaset '#{name}', no member nodes found")
+      else
+        Chef::Log.warn("Cannot configure replicaset '#{name}', no member nodes found")
+        return
+      end
     end
     
     begin
-      connection = Mongo::Connection.new('localhost', node['mongodb']['port'], :op_timeout => 5, :slave_ok => true)
+	  connection = nil
+	  rescue_connection_failure do
+	    connection = Mongo::Connection.new('localhost', node['mongodb']['port'], :op_timeout => 5, :slave_ok => true)
+	    connection.database_names # check connection
+	  end
     rescue
       Chef::Log.warn("Could not connect to database: 'localhost:#{node['mongodb']['port']}'")
       return
     end
     
-    members.sort!{ |x,y| x['name'] <=> y['name'] }
+    # Want the node originating the connection to be included in the replicaset
+    members << node unless members.any? {|m| m.name == node.name }
+    members.sort!{ |x,y| x.name <=> y.name }
     rs_members = []
     members.each_index do |n|
       port = members[n]['mongodb']['port']
       rs_members << {"_id" => n, "host" => "#{members[n]['fqdn']}:#{port}"}
     end
+
     
     Chef::Log.info(
       "Configuring replicaset with members #{members.collect{ |n| n['hostname'] }.join(', ')}"
@@ -93,7 +105,14 @@ class Chef::ResourceDefinitionList::MongoDB
         config['members'].collect!{ |m| {"_id" => m["_id"], "host" => mapping[m["host"]]} }
         config['version'] += 1
         
-        rs_connection = Mongo::ReplSetConnection.new( *old_members.collect{ |m| m.split(":") })
+     
+
+        rs_connection = nil
+        rescue_connection_failure do
+          rs_connection = Mongo::ReplSetConnection.new( old_members) 
+          rs_connection.database_names #check connection
+        end
+         
         admin = rs_connection['admin']
         cmd = BSON::OrderedHash.new
         cmd['replSetReconfig'] = config
@@ -123,7 +142,12 @@ class Chef::ResourceDefinitionList::MongoDB
           config['members'] << {"_id" => max_id, "host" => m}
         end
         
-        rs_connection = Mongo::ReplSetConnection.new( *old_members.collect{ |m| m.split(":") })
+        rs_connection = nil
+        rescue_connection_failure do
+          rs_connection = Mongo::ReplSetConnection.new( old_members) 
+          rs_connection.database_names #check connection
+        end
+        
         admin = rs_connection['admin']
         
         cmd = BSON::OrderedHash.new
@@ -156,6 +180,7 @@ class Chef::ResourceDefinitionList::MongoDB
     
     shard_nodes.each do |n|
       if n['recipes'].include?('mongodb::replicaset')
+        
         key = "rs_#{n['mongodb']['shard_name']}"
       else
         key = '_single'
@@ -259,4 +284,17 @@ class Chef::ResourceDefinitionList::MongoDB
   
   end
   
+  # Ensure retry upon failure
+  def self.rescue_connection_failure(max_retries=30)
+    retries = 0
+    begin
+      yield
+    rescue Mongo::ConnectionFailure => ex
+      retries += 1
+      raise ex if retries > max_retries
+      sleep(0.5)
+      retry
+    end
+  end
+
 end
