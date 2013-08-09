@@ -55,3 +55,8 @@ after_fork do |server, worker|
   # between any number of forked children (assuming your kernel
   # correctly implements pread()/pwrite() system calls)
 end
+
+Rainbows! do
+  use :<%= node[:rainbows][:concurrency] %>
+  worker_connections <%= node[:rainbows][:worker_connections] %> # This limits the number of connected clients per-process. The total number of clients on a server is worker_processes * worker_connections.
+end
