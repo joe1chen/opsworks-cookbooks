@@ -1,0 +1,15 @@
+[submodule "chef_handler"]
+	path = chef_handler
+	url = https://github.com/opscode-cookbooks/chef_handler.git
+[submodule "windows"]
+	path = windows
+	url = https://github.com/opscode-cookbooks/windows.git
+[submodule "ark"]
+	path = ark
+	url = https://github.com/bryanwb/chef-ark
+[submodule "java"]
+	path = java
+	url = https://github.com/opscode-cookbooks/java
+[submodule "elasticsearch"]
+	path = elasticsearch
+	url = https://github.com/elasticsearch/cookbook-elasticsearch
