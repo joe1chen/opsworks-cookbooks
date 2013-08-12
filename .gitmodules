@@ -13,3 +13,9 @@
 [submodule "elasticsearch"]
 	path = elasticsearch
 	url = https://github.com/elasticsearch/cookbook-elasticsearch
+[submodule "ulimit"]
+	path = ulimit
+	url = https://github.com/bmhatfield/chef-ulimit
+[submodule "redisio"]
+	path = redisio
+	url = https://github.com/brianbianco/redisio
