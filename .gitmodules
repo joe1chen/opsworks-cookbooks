@@ -4,3 +4,6 @@
 [submodule "windows"]
 	path = windows
 	url = https://github.com/opscode-cookbooks/windows.git
+[submodule "ark"]
+	path = ark
+	url = https://github.com/bryanwb/chef-ark
