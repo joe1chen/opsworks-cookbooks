@@ -34,3 +34,9 @@
 [submodule "ntp"]
 	path = ntp
 	url = https://github.com/opscode-cookbooks/ntp
+[submodule "firewall"]
+	path = firewall
+	url = https://github.com/opscode-cookbooks/firewall.git
+[submodule "build-essential"]
+	path = build-essential
+	url = https://github.com/opscode-cookbooks/build-essential.git
