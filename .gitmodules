@@ -31,3 +31,6 @@
 [submodule "newrelic-sysmond"]
 	path = newrelic-sysmond
 	url = https://github.com/phlipper/chef-newrelic-sysmond.git
+[submodule "ntp"]
+	path = ntp
+	url = https://github.com/opscode-cookbooks/ntp
