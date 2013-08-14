@@ -37,3 +37,7 @@
 [submodule "build-essential"]
 	path = build-essential
 	url = https://github.com/opscode-cookbooks/build-essential.git
+[submodule "newrelic-sysmond"]
+	path = newrelic-sysmond
+	url = https://github.com/joe1chen/chef-newrelic-sysmond.git
+	branch = add-apt-dependency
