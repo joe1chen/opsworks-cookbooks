@@ -9,7 +9,7 @@
 	url = https://github.com/bryanwb/chef-ark
 [submodule "java"]
 	path = java
-	url = https://github.com/opscode-cookbooks/java
+	url = https://github.com/socrata-cookbooks/java.git 
 [submodule "elasticsearch"]
 	path = elasticsearch
 	url = https://github.com/elasticsearch/cookbook-elasticsearch
